@@ -19,6 +19,9 @@ public class Main {
         while (!quit) {
             System.out.print("> ");
             input = scanner.nextLine();
+            if (input.isEmpty()) {
+                continue;
+            }
 
             SchedulingLexer lexer = new SchedulingLexer(new ANTLRInputStream(input));
             CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -39,6 +42,8 @@ public class Main {
             } else {
 
             }
+
+            classroomWalker.print();
 
             if (input.toLowerCase().equals("quit")) {
                 quit = true;

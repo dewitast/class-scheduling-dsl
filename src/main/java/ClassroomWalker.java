@@ -3,12 +3,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ClassroomWalker extends SchedulingBaseListener {
-    private int VALUE_STRING = 0;
-    private int VALUE_ARRAY = 1;
-
     private List<Classroom> classrooms;
     private Classroom current;
     private boolean active;
+    private String currentKey;
 
     public ClassroomWalker() {
         classrooms = new ArrayList<>();
@@ -33,10 +31,20 @@ public class ClassroomWalker extends SchedulingBaseListener {
             return;
         }
 
-        String key = ctx.SINGLE_STRING().getText();
-        String value = ctx.value().getText();
+        currentKey = ctx.SINGLE_STRING().getText();
+    }
 
-        if (key.equals(Classroom.NAME)) {
+    @Override
+    public void enterString(SchedulingParser.StringContext ctx) {
+        super.enterString(ctx);
+
+        if (!active) {
+            return;
+        }
+
+        String value = ctx.getText();
+
+        if (currentKey.equals(Classroom.NAME)) {
             for (Classroom c : classrooms) {
                 if (c.getName().equals(value)) {
                     active = false;
@@ -46,15 +54,8 @@ public class ClassroomWalker extends SchedulingBaseListener {
             }
         }
 
-        if (ctx.value().getRuleIndex() == VALUE_ARRAY) {
-            List<String> valueArray = asArray(value);
-            if (!current.addArray(key, valueArray)) {
-                active = false;
-            }
-        } else {
-            if (!current.addString(key, value)) {
-                active = false;
-            }
+        if (!current.addString(currentKey, value)) {
+            active = false;
         }
     }
 
@@ -64,16 +65,6 @@ public class ClassroomWalker extends SchedulingBaseListener {
         if (current.check() && active) {
             classrooms.add(current);
         }
-    }
-
-    private List<String> asArray(String s) {
-        // Array is empty
-        if (s.length()<=2) {
-            return new ArrayList<>();
-        }
-
-        s = s.substring(1, s.length()-2);
-        return new ArrayList<>(Arrays.asList(s.split(",")));
     }
 
     public void print() {

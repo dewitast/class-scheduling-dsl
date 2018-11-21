@@ -70,16 +70,6 @@ public class Classroom {
         return true;
     }
 
-    public boolean addArray(String key, List<String> value) {
-        if (key.equals(FACILITIES)) {
-            facilities.addAll(value);
-        } else {
-            System.out.println("Classroom feature and value does not match");
-            return false;
-        }
-        return true;
-    }
-
     public void print() {
         System.out.println("Name: " + this.name);
         System.out.println("Capacity: " + this.capacity);
