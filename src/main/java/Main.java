@@ -27,10 +27,15 @@ public class Main {
             }
             if (input.toLowerCase().equals("quit")) {
                 quit = true;
-            } else if (input.equals(CONSTRAINT)) {
+            } else if (input.substring(0, 10).equals(CONSTRAINT)) {
                 SchedulingLexer lexer = new SchedulingLexer(new ANTLRInputStream(input));
                 CommonTokenStream tokens = new CommonTokenStream(lexer);
                 SchedulingParser parser = new SchedulingParser(tokens);
+
+                ParseTree tree = parser.constraint();
+                ParseTreeWalker walker = new ParseTreeWalker();
+                walker.walk(classWalker, tree);
+                classWalker.print();
             } else {
                 SchedulingLexer lexer = new SchedulingLexer(new ANTLRInputStream(input));
                 CommonTokenStream tokens = new CommonTokenStream(lexer);

@@ -7,6 +7,8 @@ public class ClassWalker extends SchedulingBaseListener {
     private Class current;
     private boolean active;
     private String currentKey;
+    private Class class1;
+    private Class class2;
 
     public ClassWalker() {
         classes = new ArrayList<>();
@@ -59,6 +61,53 @@ public class ClassWalker extends SchedulingBaseListener {
         }
         if (current.check() && active) {
             classes.add(current);
+        }
+    }
+
+    @Override
+    public void enterConstraint(SchedulingParser.ConstraintContext ctx) {
+        super.enterConstraint(ctx);
+        class1 = null;
+        class2 = null;
+    }
+
+    @Override
+    public void enterKelas(SchedulingParser.KelasContext ctx) {
+        super.enterKelas(ctx);
+
+        String name = ctx.getText();
+        for (Class c : classes) {
+            if (c.getName().equals(name)) {
+                if (class1 == null) {
+                    class1 = c;
+                } else {
+                    class2 = c;
+                }
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void exitConstraint(SchedulingParser.ConstraintContext ctx) {
+        super.exitConstraint(ctx);
+        if (class1 != null) {
+            class1.print();
+        }
+        if (class2 != null) {
+            class2.print();
+        }
+        if (class1 != null && class2 != null && class1.getGrade() != class2.getGrade()
+                && !class1.getName().equals(class2.getName())) {
+            for (Class c1 : classes) {
+                for (Class c2 : classes) {
+                    if (c1.getName().equals(class1.getName()) && c2.getName().equals(class2.getName())) {
+                        c1.addClash(c2.getId());
+                    } else if (c1.getName().equals(class2.getName()) && c2.getName().equals(class1.getName())) {
+                        c1.addClash(c2.getId());
+                    }
+                }
+            }
         }
     }
 
