@@ -12,3 +12,6 @@ string: LETTER | SINGLE_STRING | DOUBLE_STRING;
 array: '[]' | '[' string ((',' string)+)? ']';
 value: string | array;
 feature: SINGLE_STRING ':' value ',';
+
+kelas: LETTER | SINGLE_STRING;
+constraint: 'constraint ' kelas kelas;
