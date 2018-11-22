@@ -69,6 +69,41 @@ public class LecturerWalker extends SchedulingBaseListener{
         }
     }
 
+    @Override
+    public void enterLecturer(SchedulingParser.LecturerContext ctx) {
+        super.enterLecturer(ctx);
+
+        currentKey = "";
+        String name = ctx.getText();
+        for (Lecturer l : lecturers) {
+            if (l.getName().equals(name)) {
+                currentKey = name;
+                break;
+            }
+        }
+        if (currentKey.length() == 0) {
+            System.out.println("There are no lecturers with name " + name);
+        }
+    }
+
+    @Override
+    public void enterUnavailability(SchedulingParser.UnavailabilityContext ctx) {
+        super.enterUnavailability(ctx);
+
+        if (currentKey.length() == 0) {
+            return;
+        }
+
+        List<String> unavailability = asArray(ctx.getText());
+        for (Lecturer l : lecturers) {
+            if (l.getName().equals(currentKey)) {
+                for (String s : unavailability) {
+                    l.addUnavailability(s);
+                }
+            }
+        }
+    }
+
     private List<String> asArray(String s) {
         if (s.charAt(0) == '[' && s.charAt(s.length()-1) == ']') {
             // Array is empty

@@ -47,8 +47,13 @@ public class Main {
 
                 ParseTree tree = parser.constraint();
                 ParseTreeWalker walker = new ParseTreeWalker();
-                walker.walk(classWalker, tree);
-                classWalker.print();
+                if (input.contains("lecture unavailability")) {
+                    walker.walk(lecturerWalker, tree);
+                    lecturerWalker.print();
+                } else {
+                    walker.walk(classWalker, tree);
+                    classWalker.print();
+                }
             } else if (input.toLowerCase().equals("schedule")) {
                 // start scheduling
                 classes = classWalker.getClasses();

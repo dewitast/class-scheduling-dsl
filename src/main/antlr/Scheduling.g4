@@ -13,6 +13,9 @@ array: '[]' | '[' string ((',' string)+)? ']';
 value: string | array;
 feature: SINGLE_STRING ':' value ',';
 
-class: LETTER | SINGLE_STRING;
+class_string: LETTER | SINGLE_STRING;
 constraint: 'add constraint' constraint_type;
-constraint_type: 'class' class class | 'lecture unavailability' array
+schedule: SINGLE_STRING;
+unavailability: '[' schedule ((',' schedule)+)? ']';
+lecturer: LETTER | SINGLE_STRING | DOUBLE_STRING;
+constraint_type: 'class' class_string class_string | 'lecture unavailability' lecturer unavailability;

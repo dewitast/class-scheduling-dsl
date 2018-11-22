@@ -72,8 +72,8 @@ public class ClassWalker extends SchedulingBaseListener {
     }
 
     @Override
-    public void enterKelas(SchedulingParser.KelasContext ctx) {
-        super.enterKelas(ctx);
+    public void enterClass_string(SchedulingParser.Class_stringContext ctx) {
+        super.enterClass_string(ctx);
 
         String name = ctx.getText();
         for (Class c : classes) {
@@ -91,12 +91,7 @@ public class ClassWalker extends SchedulingBaseListener {
     @Override
     public void exitConstraint(SchedulingParser.ConstraintContext ctx) {
         super.exitConstraint(ctx);
-        if (class1 != null) {
-            class1.print();
-        }
-        if (class2 != null) {
-            class2.print();
-        }
+
         if (class1 != null && class2 != null && class1.getGrade() != class2.getGrade()
                 && !class1.getName().equals(class2.getName())) {
             for (Class c1 : classes) {
