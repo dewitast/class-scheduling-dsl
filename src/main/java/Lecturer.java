@@ -4,16 +4,19 @@ public class Lecturer {
     public static String NAME = "name";
     public static String UNAVAILABILITY = "unavailability";
     public static String CLASSES = "classes";
+    public static String PREFERENCES =  "preferences";
 
     private String name;
-
     private Set<String> unavailability;
-
     private Set<String> classes;
+
+    private Set<String> preferences;
+
     public Lecturer() {
         name = "";
         unavailability = new HashSet<>();
         classes = new HashSet<>();
+        preferences = new HashSet<>();
     }
 
     public String getName() {
@@ -24,11 +27,11 @@ public class Lecturer {
         this.name = name;
     }
 
-    public Set<String> getAvailability() {
+    public Set<String> getUnavailability() {
         return unavailability;
     }
 
-    public void setAvailability(Set<String> unavailability) {
+    public void setUnavailability(Set<String> unavailability) {
         this.unavailability = unavailability;
     }
 
@@ -40,11 +43,22 @@ public class Lecturer {
         this.classes = classes;
     }
 
-    public void addAvailability(String unavailability) {
+    public Set<String> getPreferences() {
+        return preferences;
+    }
+
+    public void setPreferences(Set<String> preferences) {
+        this.preferences = preferences;
+    }
+
+    public void addUnavailability(String unavailability) {
         this.unavailability.add(unavailability);
     }
     public void addClass(String aClass) {
         this.unavailability.add(aClass);
+    }
+    public void addPreference(String preference) {
+        this.preferences.add(preference);
     }
 
     public boolean check() {
@@ -55,11 +69,15 @@ public class Lecturer {
         if (key.equals(NAME)) {
             this.name = value;
         } else if (key.equals(UNAVAILABILITY)) {
-            if (checkFormatAvailability(value)) {
+            if (checkTimeFormat(value)) {
                 this.unavailability.add(value);
-            }
+            } else return false;
         } else if (key.equals(CLASSES)) {
             classes.add(value);
+        } else if (key.equals(PREFERENCES)){
+            if (checkTimeFormat(value)) {
+                preferences.add(value);
+            } else return false;
         } else {
             System.out.println(value + "is not a lecturer's feature");
             return false;
@@ -67,7 +85,7 @@ public class Lecturer {
         return true;
     }
 
-    private boolean checkFormatAvailability(String value) {
+    private boolean checkTimeFormat(String value) {
         if (value.length() != 3) {
             System.out.println("Lecturer unavailability must be 3 digit");
             return false;
@@ -92,5 +110,6 @@ public class Lecturer {
         System.out.println("Name: " + this.name);
         System.out.println("Unavailability: " + this.unavailability);
         System.out.println("Classes: " + this.classes);
+        System.out.println("Preferences: "+ this.preferences);
     }
 }
