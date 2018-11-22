@@ -18,4 +18,5 @@ constraint: 'add constraint' constraint_type;
 schedule: SINGLE_STRING;
 unavailability: '[' schedule ((',' schedule)+)? ']';
 lecturer: LETTER | SINGLE_STRING | DOUBLE_STRING;
-constraint_type: 'class' class_string class_string | 'lecture unavailability' lecturer unavailability;
+constraint_type: 'class' class_string class_string | 'lecture unavailability' lecturer unavailability |
+    'restricted hour' schedule;

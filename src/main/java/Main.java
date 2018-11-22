@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+    static List<String> restrictedSchedule;
     static List<Class> classes;
     static int[] creditsLeft;
     static List<Classroom> classrooms;
@@ -50,6 +51,9 @@ public class Main {
                 if (input.contains("lecture unavailability")) {
                     walker.walk(lecturerWalker, tree);
                     lecturerWalker.print();
+                } else if (input.contains("restricted schedule")) {
+                    String s = ((SchedulingParser.ConstraintContext) tree).constraint_type().schedule().getText();
+                    restrictedSchedule.add(s);
                 } else {
                     walker.walk(classWalker, tree);
                     classWalker.print();
@@ -118,11 +122,12 @@ public class Main {
                         && classrooms.get(i).getFacilities().containsAll(classes.get(x).getRequirements())) {
                     boolean can = true;
                     for (int y = 0; y < i; y++) {
-                        if (classes.get(x).getClashes().contains(classSchedule[y][j][k].getId())) {
+                        Class now = classSchedule[y][j][k];
+                        if (now != null && classes.get(x).getClashes().contains(now.getId())) {
                             can = false;
                         }
-                        if (classes.get(x).getGrade() == classSchedule[y][j][k].getGrade()
-                                && classes.get(x).getNumber() == classSchedule[y][j][k].getNumber()) {
+                        if (now != null && classes.get(x).getGrade() == now.getGrade()
+                                && classes.get(x).getNumber() == now.getNumber()) {
                             can = false;
                         }
                     }
@@ -131,21 +136,31 @@ public class Main {
                         classSchedule[i][j][k] = classes.get(x);
                         for (Lecturer l : lecturers) {
                             if (l.getClasses().contains(classes.get(x).getCode()) && l.canTeachAt(j, k)) {
-                                lecturerSchedule[i][j][k] = l;
-                                if (k+1==HOURS) {
-                                    if (j+1==DAYS) {
-                                        if (i+1==classSchedule.length) {
-                                            if (dfsClass(i+1, j+1, k+1)) return true;
+                                boolean avail = true;
+                                for (int y = 0; y < i; y++) {
+                                    if (lecturerSchedule[y][j][k] != null
+                                            && lecturerSchedule[y][j][k].getName().equals(l.getName())) {
+                                        avail = false;
+                                        break;
+                                    }
+                                }
+                                if (avail) {
+                                    lecturerSchedule[i][j][k] = l;
+                                    if (k + 1 == HOURS) {
+                                        if (j + 1 == DAYS) {
+                                            if (i + 1 == classSchedule.length) {
+                                                if (dfsClass(i + 1, j + 1, k + 1)) return true;
+                                            } else {
+                                                if (dfsClass(i + 1, 0, 0)) return true;
+                                            }
                                         } else {
-                                            if (dfsClass(i+1, 0, 0)) return true;
+                                            if (dfsClass(i, j + 1, 0)) return true;
                                         }
                                     } else {
-                                        if (dfsClass(i, j+1, 0)) return true;
+                                        if (dfsClass(i, j, k + 1)) return true;
                                     }
-                                } else {
-                                    if (dfsClass(i, j, k+1)) return true;
+                                    lecturerSchedule[i][j][k] = null;
                                 }
-                                lecturerSchedule[i][j][k] = null;
                             }
                         }
                         classSchedule[i][j][k] = null;
