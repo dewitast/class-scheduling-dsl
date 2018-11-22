@@ -13,6 +13,7 @@ public class Main {
         String PROJECT = "project";
         ClassroomWalker classroomWalker = new ClassroomWalker();
         ClassWalker classWalker = new ClassWalker();
+        LecturerWalker lecturerWalker = new LecturerWalker();
         Scanner scanner = new Scanner(System.in);
         boolean quit = false;
         String input;
@@ -39,7 +40,8 @@ public class Main {
                 walker.walk(classWalker, tree);
                 classWalker.print();
             } else if (obj.equals(LECTURER)) {
-
+                walker.walk(lecturerWalker, tree);
+                lecturerWalker.print();
             } else if (obj.equals(PROJECT)) {
 
             } else {
