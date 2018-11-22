@@ -13,5 +13,6 @@ array: '[]' | '[' string ((',' string)+)? ']';
 value: string | array;
 feature: SINGLE_STRING ':' value ',';
 
-kelas: LETTER | SINGLE_STRING;
-constraint: 'constraint ' kelas kelas;
+class: LETTER | SINGLE_STRING;
+constraint: 'add constraint' constraint_type;
+constraint_type: 'class' class class | 'lecture unavailability' array

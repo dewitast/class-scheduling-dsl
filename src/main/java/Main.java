@@ -27,7 +27,7 @@ public class Main {
             }
             if (input.toLowerCase().equals("quit")) {
                 quit = true;
-            } else if (input.substring(0, 10).equals(CONSTRAINT)) {
+            } else if (input.toLowerCase().indexOf("add "+CONSTRAINT)==0) {
                 SchedulingLexer lexer = new SchedulingLexer(new ANTLRInputStream(input));
                 CommonTokenStream tokens = new CommonTokenStream(lexer);
                 SchedulingParser parser = new SchedulingParser(tokens);
