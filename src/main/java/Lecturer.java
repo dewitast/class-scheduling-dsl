@@ -85,7 +85,7 @@ public class Lecturer {
         return true;
     }
 
-    private boolean checkTimeFormat(String value) {
+    public boolean checkTimeFormat(String value) {
         if (value.length() != 3) {
             System.out.println("Lecturer unavailability must be 3 digit");
             return false;

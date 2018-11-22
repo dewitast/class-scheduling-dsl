@@ -20,3 +20,6 @@ unavailability: '[' schedule ((',' schedule)+)? ']';
 lecturer: LETTER | SINGLE_STRING | DOUBLE_STRING;
 constraint_type: 'class' class_string class_string | 'lecture unavailability' lecturer unavailability |
     'restricted hour' schedule;
+
+preferences: '[' schedule ((',' schedule)+)? ']';
+preference: 'add preference' lecturer preferences;

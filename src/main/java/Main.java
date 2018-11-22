@@ -3,11 +3,12 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    private static List<String> restrictedSchedule;
+    private static List<String> restrictedSchedule = new ArrayList<>();
     private static List<Class> classes;
     private static int[] creditsLeft;
     private static List<Classroom> classrooms;
@@ -25,6 +26,7 @@ public class Main {
         String LECTURER = "lecturer";
         String PROJECT = "project";
         String CONSTRAINT = "constraint";
+        String PREFERENCE = "preference";
         ClassroomWalker classroomWalker = new ClassroomWalker();
         ClassWalker classWalker = new ClassWalker();
         LecturerWalker lecturerWalker = new LecturerWalker();
@@ -51,13 +53,22 @@ public class Main {
                 if (input.contains("lecture unavailability")) {
                     walker.walk(lecturerWalker, tree);
                     lecturerWalker.print();
-                } else if (input.contains("restricted schedule")) {
+                } else if (input.contains("restricted hour")) {
                     String s = ((SchedulingParser.ConstraintContext) tree).constraint_type().schedule().getText();
                     restrictedSchedule.add(s);
                 } else {
                     walker.walk(classWalker, tree);
                     classWalker.print();
                 }
+            } else if (input.toLowerCase().indexOf("add "+PREFERENCE)==0) {
+                SchedulingLexer lexer = new SchedulingLexer(new ANTLRInputStream(input));
+                CommonTokenStream tokens = new CommonTokenStream(lexer);
+                SchedulingParser parser = new SchedulingParser(tokens);
+
+                ParseTree tree = parser.preference();
+                ParseTreeWalker walker = new ParseTreeWalker();
+                walker.walk(lecturerWalker, tree);
+                lecturerWalker.print();
             } else if (input.toLowerCase().equals("schedule")) {
                 // start scheduling
                 classes = classWalker.getClasses();
@@ -72,7 +83,7 @@ public class Main {
                 classSchedule = new Class[classrooms.size()][DAYS][HOURS];
                 lecturerSchedule = new Lecturer[classrooms.size()][HOURS][HOURS];
 
-                dfsClass(0, 0, 0);
+                generateSchedule();
                 printClass();
                 quit = true;
             } else {
@@ -103,6 +114,59 @@ public class Main {
         }
     }
 
+    static void generateSchedule() {
+        dfsClass(0, 0, 0);
+
+        // find preferred schedule
+        for (int i = 0; i < classSchedule.length; i++) {
+            for (int j = 0; j < DAYS; j++) {
+                for (int k = 0; k < HOURS; k++) {
+                    if (classSchedule[i][j][k] != null && lecturerSchedule[i][j][k] != null) {
+                        Lecturer l = lecturerSchedule[i][j][k];
+                        Class c = classSchedule[i][j][k];
+                        for (String p : l.getPreferences()) {
+                            int d = p.charAt(0) - '0' - 1;
+                            int h = (p.charAt(1) - '0') * 10 + p.charAt(2) - '0' - 1;
+                            if (d==j && h==k) continue;
+                            if (!l.canTeachAt(d, h)) continue;
+                            if (restrictedSchedule.contains(p)) continue;
+                            boolean can = true;
+                            for (int x = 0; x < classrooms.size(); x++) {
+                                if (lecturerSchedule[x][d][h] != null
+                                        && !lecturerSchedule[x][d][h].getName().equals(l.getName())) {
+                                    can = false;
+                                    break;
+                                }
+                                Class now = classSchedule[x][d][h];
+                                if (now != null && c.getClashes().contains(now.getId())) {
+                                    can = false;
+                                    break;
+                                }
+                                if (now != null && c.getGrade() == now.getGrade() && c.getNumber() == now.getNumber()) {
+                                    can = false;
+                                    break;
+                                }
+                            }
+                            if (can) {
+                                for (int x = 0; x < classrooms.size(); x++) {
+                                    if (classSchedule[x][d][h] == null && classrooms.get(x).getCapacity() >= c.getSize()
+                                            && classrooms.get(i).getFacilities().containsAll(c.getRequirements())) {
+                                        classSchedule[x][d][h] = c;
+                                        lecturerSchedule[x][d][h] = l;
+                                        classSchedule[i][j][k] = null;
+                                        lecturerSchedule[i][j][k] = null;
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     static boolean dfsClass(int i, int j, int k) {
         boolean still = false;
         for (int x = 0; x < classes.size(); x++) {
@@ -115,6 +179,9 @@ public class Main {
             return true;
         } else {
             String schedule = Integer.toString(j+1) + Integer.toString(k+1);
+            if (schedule.length() < 3) {
+                schedule = "" + schedule.charAt(0) + '0' + schedule.charAt(1);
+            }
             if (!restrictedSchedule.contains(schedule)) {
                 for (int x = 0; x < classes.size(); x++) {
                     if (creditsLeft[x] > 0 && classrooms.get(i).getCapacity() >= classes.get(x).getSize()
@@ -124,10 +191,12 @@ public class Main {
                             Class now = classSchedule[y][j][k];
                             if (now != null && classes.get(x).getClashes().contains(now.getId())) {
                                 can = false;
+                                break;
                             }
                             if (now != null && classes.get(x).getGrade() == now.getGrade()
                                     && classes.get(x).getNumber() == now.getNumber()) {
                                 can = false;
+                                break;
                             }
                         }
                         if (can) {

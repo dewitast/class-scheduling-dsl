@@ -67,6 +67,8 @@ public class LecturerWalker extends SchedulingBaseListener{
         if (current.check() && active) {
             lecturers.add(current);
         }
+        current = null;
+        currentKey = "";
     }
 
     @Override
@@ -98,7 +100,29 @@ public class LecturerWalker extends SchedulingBaseListener{
         for (Lecturer l : lecturers) {
             if (l.getName().equals(currentKey)) {
                 for (String s : unavailability) {
-                    l.addUnavailability(s);
+                    if (l.checkTimeFormat(s)) {
+                        l.addUnavailability(s);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void enterPreferences(SchedulingParser.PreferencesContext ctx) {
+        super.enterPreferences(ctx);
+
+        if (currentKey.length() == 0) {
+            return;
+        }
+
+        List<String> preferences = asArray(ctx.getText());
+        for (Lecturer l : lecturers) {
+            if (l.getName().equals(currentKey)) {
+                for (String s : preferences) {
+                    if (l.checkTimeFormat(s)) {
+                        l.addPreference(s);
+                    }
                 }
             }
         }
