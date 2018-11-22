@@ -106,6 +106,15 @@ public class Lecturer {
         }
     }
 
+    public boolean canTeachAt(int day, int hour) {
+        for (String s : unavailability) {
+            if (s.charAt(0)-'0' == day + 1 && (s.charAt(1)-'0')*10 + s.charAt(2)-'0' == hour + 1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void print() {
         System.out.println("Name: " + this.name);
         System.out.println("Unavailability: " + this.unavailability);

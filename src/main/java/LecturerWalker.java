@@ -13,6 +13,10 @@ public class LecturerWalker extends SchedulingBaseListener{
         lecturers = new ArrayList<>();
     }
 
+    public List<Lecturer> getLecturers() {
+        return lecturers;
+    }
+
     @Override
     public void enterQuery(SchedulingParser.QueryContext ctx) {
         super.enterQuery(ctx);
