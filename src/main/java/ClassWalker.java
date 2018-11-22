@@ -75,9 +75,9 @@ public class ClassWalker extends SchedulingBaseListener {
     public void enterClass_string(SchedulingParser.Class_stringContext ctx) {
         super.enterClass_string(ctx);
 
-        String name = ctx.getText();
+        String code = ctx.getText();
         for (Class c : classes) {
-            if (c.getName().equals(name)) {
+            if (c.getCode().equals(code)) {
                 if (class1 == null) {
                     class1 = c;
                 } else {
@@ -91,15 +91,15 @@ public class ClassWalker extends SchedulingBaseListener {
     @Override
     public void exitConstraint(SchedulingParser.ConstraintContext ctx) {
         super.exitConstraint(ctx);
-
-        if (class1 != null && class2 != null && class1.getGrade() != class2.getGrade()
-                && !class1.getName().equals(class2.getName())) {
+        if (class1 != null && class2 != null && !class1.getCode().equals(class2.getCode())) {
             for (Class c1 : classes) {
                 for (Class c2 : classes) {
-                    if (c1.getName().equals(class1.getName()) && c2.getName().equals(class2.getName())) {
-                        c1.addClash(c2.getId());
-                    } else if (c1.getName().equals(class2.getName()) && c2.getName().equals(class1.getName())) {
-                        c1.addClash(c2.getId());
+                    if (c1.getCode().equals(class1.getCode()) && c2.getCode().equals(class2.getCode())) {
+                        if (c1.getGrade() != c2.getGrade()) c1.addClash(c2.getId());
+                        else if (c1.getNumber() != c2.getNumber()) c1.addClash(c2.getId());
+                    } else if (c1.getCode().equals(class2.getCode()) && c2.getCode().equals(class1.getCode())) {
+                        if (c1.getGrade() != c2.getGrade()) c1.addClash(c2.getId());
+                        else if (c1.getNumber() != c2.getNumber()) c1.addClash(c2.getId());
                     }
                 }
             }
