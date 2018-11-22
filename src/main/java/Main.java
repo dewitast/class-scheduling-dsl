@@ -72,12 +72,9 @@ public class Main {
                 classSchedule = new Class[classrooms.size()][DAYS][HOURS];
                 lecturerSchedule = new Lecturer[classrooms.size()][HOURS][HOURS];
 
-                if (dfsClass(0, 0, 0)) {
-                    System.out.println("succeed");
-                } else {
-                    System.out.println("failed");
-                };
+                dfsClass(0, 0, 0);
                 printClass();
+                quit = true;
             } else {
                 // create object
                 SchedulingLexer lexer = new SchedulingLexer(new ANTLRInputStream(input));
