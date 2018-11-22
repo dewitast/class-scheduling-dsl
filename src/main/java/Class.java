@@ -214,14 +214,10 @@ public class Class {
 
     public void print() {
         System.out.println("Id: " + this.id);
-        System.out.println("Name: " + this.name);
-        System.out.println("Code: " + this.code);
-        System.out.println("Requirements: " + requirements);
-        System.out.println("Size: " + this.size);
-        System.out.println("Number: " + this.number);
-        System.out.println("Credit: " + this.credit);
-        System.out.println("Grade: " + this.grade);
-        System.out.println("Clashes: " + this.clashes);
-        System.out.println("Schedules: " + schedules);
+        System.out.println("    Name: " + this.name);
+        System.out.println("    Code: " + this.code + " - Number: "+this.number+ " - Grade: "+this.grade);
+        System.out.println("    Requirements: " + requirements);
+        System.out.println("    Size: " + this.size+" - Credit: "+this.credit);
+        System.out.println("    Clashes: " + this.clashes);
     }
 }

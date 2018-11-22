@@ -7,6 +7,8 @@ public class ClassroomWalker extends SchedulingBaseListener {
     private Classroom current;
     private boolean active;
     private String currentKey;
+    private String currentFunction;
+    private String currentTargetKey;
 
     public ClassroomWalker() {
         classrooms = new ArrayList<>();
@@ -19,8 +21,21 @@ public class ClassroomWalker extends SchedulingBaseListener {
     @Override
     public void enterQuery(SchedulingParser.QueryContext ctx) {
         super.enterQuery(ctx);
-        current = new Classroom();
         active = true;
+    }
+
+    @Override
+    public void enterFunction(SchedulingParser.FunctionContext ctx) {
+        super.enterFunction(ctx);
+        if (!active) {
+            return;
+        }
+        currentFunction = ctx.getText();
+        if (currentFunction.equals("show")){
+            print();
+        } else if (currentFunction.equals("create")){
+            current = new Classroom();
+        }
     }
 
     @Override
@@ -35,6 +50,12 @@ public class ClassroomWalker extends SchedulingBaseListener {
     }
 
     @Override
+    public void enterTarget_key(SchedulingParser.Target_keyContext ctx) {
+        super.enterTarget_key(ctx);
+        currentTargetKey = ctx.getText();
+    }
+
+    @Override
     public void enterString(SchedulingParser.StringContext ctx) {
         super.enterString(ctx);
 
@@ -43,16 +64,26 @@ public class ClassroomWalker extends SchedulingBaseListener {
         }
 
         String value = ctx.getText();
-
-        if (currentKey.equals(Classroom.NAME)) {
-            for (Classroom c : classrooms) {
-                if (c.getName().equals(value)) {
-                    active = false;
-                    System.out.println("Classroom name is already used");
-                    return;
+        if (currentFunction.equals("create")){
+            if (currentKey.equals(Classroom.NAME)) {
+                for (Classroom c : classrooms) {
+                    if (c.getName().equals(value)) {
+                        active = false;
+                        System.out.println("Classroom name is already used");
+                        return;
+                    }
+                }
+            }
+        } else if (currentFunction.equals("update")) {
+            if (currentKey.equals(Classroom.CAPACITY)) {
+                for (Classroom c : classrooms) {
+                    if (c.getName().equals(currentTargetKey)) {
+                        c.addString(currentKey,value);
+                    }
                 }
             }
         }
+
 
         if (!current.addString(currentKey, value)) {
             active = false;
@@ -62,9 +93,21 @@ public class ClassroomWalker extends SchedulingBaseListener {
     @Override
     public void exitQuery(SchedulingParser.QueryContext ctx) {
         super.exitQuery(ctx);
-        if (current.check() && active) {
-            classrooms.add(current);
+        if (currentFunction.equals("create")) {
+            if (current.check() && active) {
+                classrooms.add(current);
+            }
+        } else if (currentFunction.equals("delete")){
+            Classroom deletedClassroom = new Classroom();
+            for (Classroom c : classrooms) {
+                if (c.getName().equals(currentTargetKey)) {
+                    //classroom name is primary key, only found exactly 1
+                    deletedClassroom = c;
+                }
+            }
+            classrooms.remove(deletedClassroom);
         }
+
     }
 
     public void print() {

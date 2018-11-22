@@ -93,15 +93,14 @@ public class Main {
                 SchedulingParser parser = new SchedulingParser(tokens);
 
                 ParseTree tree = parser.query();
-                String obj = ((SchedulingParser.QueryContext) tree).method().parameter_create().getText();
+                String obj = ((SchedulingParser.QueryContext) tree).target().getText();
 
                 ParseTreeWalker walker = new ParseTreeWalker();
                 if (obj.equals(CLASSROOM)) {
                     walker.walk(classroomWalker, tree);
-                    classroomWalker.print();
+//                    classroomWalker.print();
                 } else if (obj.equals(CLASS)) {
                     walker.walk(classWalker, tree);
-                    classWalker.print();
                 } else if (obj.equals(LECTURER)) {
                     walker.walk(lecturerWalker, tree);
                     lecturerWalker.print();
