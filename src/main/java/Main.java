@@ -40,8 +40,7 @@ public class Main {
             if (input.toLowerCase().equals("quit")) {
                 // quit program
                 quit = true;
-            } else if (input.length() > 10 && input.substring(0, 10).equals(CONSTRAINT)) {
-                // add constraint
+            } else if (input.toLowerCase().indexOf("add "+CONSTRAINT)==0) {
                 SchedulingLexer lexer = new SchedulingLexer(new ANTLRInputStream(input));
                 CommonTokenStream tokens = new CommonTokenStream(lexer);
                 SchedulingParser parser = new SchedulingParser(tokens);
