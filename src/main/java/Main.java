@@ -7,17 +7,17 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    static List<String> restrictedSchedule;
-    static List<Class> classes;
-    static int[] creditsLeft;
-    static List<Classroom> classrooms;
-    static List<Lecturer> lecturers;
+    private static List<String> restrictedSchedule;
+    private static List<Class> classes;
+    private static int[] creditsLeft;
+    private static List<Classroom> classrooms;
+    private static List<Lecturer> lecturers;
 
-    static Class[][][] classSchedule;
-    static Lecturer[][][] lecturerSchedule;
+    private static Class[][][] classSchedule;
+    private static Lecturer[][][] lecturerSchedule;
 
-    static int DAYS = 5;
-    static int HOURS = 11;
+    private static int DAYS = 5;
+    private static int HOURS = 11;
 
     public static void main(String[] args) {
         String CLASSROOM = "classroom";
@@ -114,54 +114,57 @@ public class Main {
         if (!still || i==classSchedule.length && j==DAYS && k==HOURS) {
             return true;
         } else {
-            for (int x = 0; x < classes.size(); x++) {
-                if (creditsLeft[x] > 0 && classrooms.get(i).getCapacity() >= classes.get(x).getSize()
-                        && classrooms.get(i).getFacilities().containsAll(classes.get(x).getRequirements())) {
-                    boolean can = true;
-                    for (int y = 0; y < i; y++) {
-                        Class now = classSchedule[y][j][k];
-                        if (now != null && classes.get(x).getClashes().contains(now.getId())) {
-                            can = false;
-                        }
-                        if (now != null && classes.get(x).getGrade() == now.getGrade()
-                                && classes.get(x).getNumber() == now.getNumber()) {
-                            can = false;
-                        }
-                    }
-                    if (can) {
-                        --creditsLeft[x];
-                        classSchedule[i][j][k] = classes.get(x);
-                        for (Lecturer l : lecturers) {
-                            if (l.getClasses().contains(classes.get(x).getCode()) && l.canTeachAt(j, k)) {
-                                boolean avail = true;
-                                for (int y = 0; y < i; y++) {
-                                    if (lecturerSchedule[y][j][k] != null
-                                            && lecturerSchedule[y][j][k].getName().equals(l.getName())) {
-                                        avail = false;
-                                        break;
-                                    }
-                                }
-                                if (avail) {
-                                    lecturerSchedule[i][j][k] = l;
-                                    if (k + 1 == HOURS) {
-                                        if (j + 1 == DAYS) {
-                                            if (i + 1 == classSchedule.length) {
-                                                if (dfsClass(i + 1, j + 1, k + 1)) return true;
-                                            } else {
-                                                if (dfsClass(i + 1, 0, 0)) return true;
-                                            }
-                                        } else {
-                                            if (dfsClass(i, j + 1, 0)) return true;
-                                        }
-                                    } else {
-                                        if (dfsClass(i, j, k + 1)) return true;
-                                    }
-                                    lecturerSchedule[i][j][k] = null;
-                                }
+            String schedule = Integer.toString(j+1) + Integer.toString(k+1);
+            if (!restrictedSchedule.contains(schedule)) {
+                for (int x = 0; x < classes.size(); x++) {
+                    if (creditsLeft[x] > 0 && classrooms.get(i).getCapacity() >= classes.get(x).getSize()
+                            && classrooms.get(i).getFacilities().containsAll(classes.get(x).getRequirements())) {
+                        boolean can = true;
+                        for (int y = 0; y < i; y++) {
+                            Class now = classSchedule[y][j][k];
+                            if (now != null && classes.get(x).getClashes().contains(now.getId())) {
+                                can = false;
+                            }
+                            if (now != null && classes.get(x).getGrade() == now.getGrade()
+                                    && classes.get(x).getNumber() == now.getNumber()) {
+                                can = false;
                             }
                         }
-                        classSchedule[i][j][k] = null;
-                        ++creditsLeft[x];
+                        if (can) {
+                            --creditsLeft[x];
+                            classSchedule[i][j][k] = classes.get(x);
+                            for (Lecturer l : lecturers) {
+                                if (l.getClasses().contains(classes.get(x).getCode()) && l.canTeachAt(j, k)) {
+                                    boolean avail = true;
+                                    for (int y = 0; y < i; y++) {
+                                        if (lecturerSchedule[y][j][k] != null
+                                                && lecturerSchedule[y][j][k].getName().equals(l.getName())) {
+                                            avail = false;
+                                            break;
+                                        }
+                                    }
+                                    if (avail) {
+                                        lecturerSchedule[i][j][k] = l;
+                                        if (k + 1 == HOURS) {
+                                            if (j + 1 == DAYS) {
+                                                if (i + 1 == classSchedule.length) {
+                                                    if (dfsClass(i + 1, j + 1, k + 1)) return true;
+                                                } else {
+                                                    if (dfsClass(i + 1, 0, 0)) return true;
+                                                }
+                                            } else {
+                                                if (dfsClass(i, j + 1, 0)) return true;
+                                            }
+                                        } else {
+                                            if (dfsClass(i, j, k + 1)) return true;
+                                        }
+                                        lecturerSchedule[i][j][k] = null;
+                                    }
+                                }
+                            }
+                            classSchedule[i][j][k] = null;
+                            ++creditsLeft[x];
+                        }
                     }
                 }
             }
