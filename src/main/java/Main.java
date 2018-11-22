@@ -12,6 +12,7 @@ public class Main {
         String LECTURER = "lecturer";
         String PROJECT = "project";
         ClassroomWalker classroomWalker = new ClassroomWalker();
+        ClassWalker classWalker = new ClassWalker();
         Scanner scanner = new Scanner(System.in);
         boolean quit = false;
         String input;
@@ -33,8 +34,10 @@ public class Main {
             ParseTreeWalker walker = new ParseTreeWalker();
             if (obj.equals(CLASSROOM)) {
                 walker.walk(classroomWalker, tree);
+                classroomWalker.print();
             } else if (obj.equals(CLASS)) {
-
+                walker.walk(classWalker, tree);
+                classWalker.print();
             } else if (obj.equals(LECTURER)) {
 
             } else if (obj.equals(PROJECT)) {
