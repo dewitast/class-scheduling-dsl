@@ -9,11 +9,11 @@ target: 'classroom' | 'class' | 'lecturer';
 function:'create'|'show'|'update'|'delete';
 target_key: LETTER | SINGLE_STRING | DOUBLE_STRING;
 update_key: 'add'|'remove';
-query: function target (target_key)? (update_key)? ('(' feature+ ')')?;
+query: function target (target_key)? (update_key)? ('(' feature ((',' feature)+)? ')')?;
 string: LETTER | SINGLE_STRING | DOUBLE_STRING;
 array: '[]' | '[' string ((',' string)+)? ']';
 value: string | array;
-feature: SINGLE_STRING ':' value ',';
+feature: SINGLE_STRING ':' value;
 
 constraint: update_key 'constraint' constraint_type;
 class_string: LETTER | SINGLE_STRING;
