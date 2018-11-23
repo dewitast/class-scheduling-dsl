@@ -105,7 +105,7 @@ public class Main {
                     walker.walk(classWalker, tree);
                 } else if (obj.equals(LECTURER)) {
                     walker.walk(lecturerWalker, tree);
-                    lecturerWalker.print();
+//                    lecturerWalker.print();
                 } else if (obj.equals(PROJECT)) {
 
                 } else {
