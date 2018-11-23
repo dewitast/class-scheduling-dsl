@@ -3,9 +3,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     private static List<String> restrictedSchedule = new ArrayList<>();
@@ -18,6 +16,10 @@ public class Main {
     private static Lecturer[][][] lecturerSchedule;
 
     private static int DAYS = 5;
+    private static List<String> dayName = new ArrayList<>(Arrays.asList("Senin", "Selasa", "Rabu", "Kamis", "Jumat"));
+    private static List<String> timeSlot = new ArrayList<>(Arrays.asList("07.00-08.00", "08.00-09.00", "09.00-10.00",
+            "10.00-11.00", "11.00-12.00", "12.00-13.00", "13.00-14.00", "14.00-15.00", "15.00-16.00", "16.00-17.00",
+            "17.00-18.00"));
     private static int HOURS = 11;
 
     public static void main(String[] args) {
@@ -43,7 +45,7 @@ public class Main {
             if (input.toLowerCase().equals("quit")) {
                 // quit program
                 quit = true;
-            } else if (input.toLowerCase().indexOf("add "+CONSTRAINT)==0) {
+            } else if (input.toLowerCase().indexOf("add " + CONSTRAINT) == 0) {
                 SchedulingLexer lexer = new SchedulingLexer(new ANTLRInputStream(input));
                 CommonTokenStream tokens = new CommonTokenStream(lexer);
                 SchedulingParser parser = new SchedulingParser(tokens);
@@ -60,7 +62,7 @@ public class Main {
                     walker.walk(classWalker, tree);
                     classWalker.print();
                 }
-            } else if (input.toLowerCase().indexOf("add "+PREFERENCE)==0) {
+            } else if (input.toLowerCase().indexOf("add " + PREFERENCE) == 0) {
                 SchedulingLexer lexer = new SchedulingLexer(new ANTLRInputStream(input));
                 CommonTokenStream tokens = new CommonTokenStream(lexer);
                 SchedulingParser parser = new SchedulingParser(tokens);
@@ -84,7 +86,7 @@ public class Main {
                 lecturerSchedule = new Lecturer[classrooms.size()][HOURS][HOURS];
 
                 generateSchedule();
-                printClass();
+                printSchedule();
                 quit = true;
             } else {
                 // create object
@@ -126,7 +128,7 @@ public class Main {
                         for (String p : l.getPreferences()) {
                             int d = p.charAt(0) - '0' - 1;
                             int h = (p.charAt(1) - '0') * 10 + p.charAt(2) - '0' - 1;
-                            if (d==j && h==k) continue;
+                            if (d == j && h == k) continue;
                             if (!l.canTeachAt(d, h)) continue;
                             if (restrictedSchedule.contains(p)) continue;
                             boolean can = true;
@@ -174,10 +176,10 @@ public class Main {
                 break;
             }
         }
-        if (!still || i==classSchedule.length && j==DAYS && k==HOURS) {
+        if (!still || i == classSchedule.length && j == DAYS && k == HOURS) {
             return true;
         } else {
-            String schedule = Integer.toString(j+1) + Integer.toString(k+1);
+            String schedule = Integer.toString(j + 1) + Integer.toString(k + 1);
             if (schedule.length() < 3) {
                 schedule = "" + schedule.charAt(0) + '0' + schedule.charAt(1);
             }
@@ -236,28 +238,48 @@ public class Main {
                     }
                 }
             }
-            if (k+1==HOURS) {
-                if (j+1==DAYS) {
-                    if (i+1==classSchedule.length) {
-                        return dfsClass(i+1, j+1, k+1);
+            if (k + 1 == HOURS) {
+                if (j + 1 == DAYS) {
+                    if (i + 1 == classSchedule.length) {
+                        return dfsClass(i + 1, j + 1, k + 1);
                     } else {
-                        return (dfsClass(i+1, 0, 0));
+                        return (dfsClass(i + 1, 0, 0));
                     }
                 } else {
-                    return (dfsClass(i, j+1, 0));
+                    return (dfsClass(i, j + 1, 0));
                 }
             } else {
-                return (dfsClass(i, j, k+1));
+                return (dfsClass(i, j, k + 1));
             }
         }
     }
 
-    static void printClass() {
-        for (int i = 0; i < classSchedule.length; i++) {
-            for (int j = 0; j < DAYS; j++) {
-                for (int k = 0; k < HOURS; k++) {
-                    if (classSchedule[i][j][k] != null) System.out.print('(' + classSchedule[i][j][k].getId() + ", " + lecturerSchedule[i][j][k].getName() + ')');
-                    else System.out.print("- ");
+//    static void printSchedulee() {
+//        for (int i = 0; i < classSchedule.length; i++) {
+//            for (int k = 0; k < HOURS; k++) {
+//                for (int j = 0; j < DAYS; j++) {
+//                    if (classSchedule[i][j][k] != null)
+//                        System.out.print('(' + classSchedule[i][j][k].getId() + ", " + lecturerSchedule[i][j][k].getName() + ')');
+//                    else System.out.print("- ");
+//                }
+//                System.out.println();
+//            }
+//            System.out.println();
+//        }
+//    }
+
+    static void printSchedule() {
+        System.out.println();
+        for (int j = 0; j < DAYS; j++) {
+            System.out.println("*******");
+            System.out.println(dayName.get(j).toUpperCase());
+            System.out.println("*******");
+            for (int k = 0; k < HOURS; k++) {
+                System.out.print(timeSlot.get(k) + ": ");
+                for (int i = 0; i < classSchedule.length; i++) {
+                    if (classSchedule[i][j][k] != null) {
+                        System.out.print('(' + classSchedule[i][j][k].getId() + ", " + lecturerSchedule[i][j][k].getName() + ", " + classrooms.get(i).getName() + ')');
+                    }
                 }
                 System.out.println();
             }
