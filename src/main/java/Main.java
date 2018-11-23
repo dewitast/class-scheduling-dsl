@@ -54,13 +54,11 @@ public class Main {
                 ParseTreeWalker walker = new ParseTreeWalker();
                 if (input.contains("lecture unavailability")) {
                     walker.walk(lecturerWalker, tree);
-                    lecturerWalker.print();
                 } else if (input.contains("restricted hour")) {
                     String s = ((SchedulingParser.ConstraintContext) tree).constraint_type().schedule().getText();
                     restrictedSchedule.add(s);
                 } else {
                     walker.walk(classWalker, tree);
-                    classWalker.print();
                 }
             } else if (input.toLowerCase().indexOf("add " + PREFERENCE) == 0) {
                 SchedulingLexer lexer = new SchedulingLexer(new ANTLRInputStream(input));
@@ -70,9 +68,8 @@ public class Main {
                 ParseTree tree = parser.preference();
                 ParseTreeWalker walker = new ParseTreeWalker();
                 walker.walk(lecturerWalker, tree);
-                lecturerWalker.print();
             } else if (input.toLowerCase().equals("schedule")) {
-                // start scheduling
+                // getting information
                 classes = classWalker.getClasses();
                 classrooms = classroomWalker.getClassrooms();
                 lecturers = lecturerWalker.getLecturers();
@@ -82,12 +79,22 @@ public class Main {
                     creditsLeft[i] = classes.get(i).getCredit();
                 }
 
-                classSchedule = new Class[classrooms.size()][DAYS][HOURS];
-                lecturerSchedule = new Lecturer[classrooms.size()][HOURS][HOURS];
+                if (classes.size() == 0) {
+                    System.out.println("No classes are available");
+                } else if (classrooms.size() == 0) {
+                    System.out.println("No classrooms are available");
+                } else if (lecturers.size() == 0) {
+                    System.out.println("No lecturers are available");
+                } else {
+                    // setting schedule
+                    classSchedule = new Class[classrooms.size()][DAYS][HOURS];
+                    lecturerSchedule = new Lecturer[classrooms.size()][HOURS][HOURS];
 
-                generateSchedule();
-                printSchedule();
-                quit = true;
+                    // start schedule
+                    generateSchedule();
+                    printSchedule();
+                    quit = true;
+                }
             } else {
                 // create object
                 SchedulingLexer lexer = new SchedulingLexer(new ANTLRInputStream(input));
@@ -100,12 +107,10 @@ public class Main {
                 ParseTreeWalker walker = new ParseTreeWalker();
                 if (obj.equals(CLASSROOM)) {
                     walker.walk(classroomWalker, tree);
-//                    classroomWalker.print();
                 } else if (obj.equals(CLASS)) {
                     walker.walk(classWalker, tree);
                 } else if (obj.equals(LECTURER)) {
                     walker.walk(lecturerWalker, tree);
-//                    lecturerWalker.print();
                 } else if (obj.equals(PROJECT)) {
 
                 } else {
@@ -253,20 +258,6 @@ public class Main {
             }
         }
     }
-
-//    static void printSchedulee() {
-//        for (int i = 0; i < classSchedule.length; i++) {
-//            for (int k = 0; k < HOURS; k++) {
-//                for (int j = 0; j < DAYS; j++) {
-//                    if (classSchedule[i][j][k] != null)
-//                        System.out.print('(' + classSchedule[i][j][k].getId() + ", " + lecturerSchedule[i][j][k].getName() + ')');
-//                    else System.out.print("- ");
-//                }
-//                System.out.println();
-//            }
-//            System.out.println();
-//        }
-//    }
 
     static void printSchedule() {
         System.out.println();
