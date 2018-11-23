@@ -45,29 +45,6 @@ public class Main {
             if (input.toLowerCase().equals("quit")) {
                 // quit program
                 quit = true;
-            } else if (input.toLowerCase().indexOf("add " + CONSTRAINT) == 0) {
-                SchedulingLexer lexer = new SchedulingLexer(new ANTLRInputStream(input));
-                CommonTokenStream tokens = new CommonTokenStream(lexer);
-                SchedulingParser parser = new SchedulingParser(tokens);
-
-                ParseTree tree = parser.constraint();
-                ParseTreeWalker walker = new ParseTreeWalker();
-                if (input.contains("lecture unavailability")) {
-                    walker.walk(lecturerWalker, tree);
-                } else if (input.contains("restricted hour")) {
-                    String s = ((SchedulingParser.ConstraintContext) tree).constraint_type().schedule().getText();
-                    restrictedSchedule.add(s);
-                } else {
-                    walker.walk(classWalker, tree);
-                }
-            } else if (input.toLowerCase().indexOf("add " + PREFERENCE) == 0) {
-                SchedulingLexer lexer = new SchedulingLexer(new ANTLRInputStream(input));
-                CommonTokenStream tokens = new CommonTokenStream(lexer);
-                SchedulingParser parser = new SchedulingParser(tokens);
-
-                ParseTree tree = parser.preference();
-                ParseTreeWalker walker = new ParseTreeWalker();
-                walker.walk(lecturerWalker, tree);
             } else if (input.toLowerCase().equals("schedule")) {
                 // getting information
                 classes = classWalker.getClasses();
@@ -96,25 +73,41 @@ public class Main {
                     quit = true;
                 }
             } else {
-                // create object
                 SchedulingLexer lexer = new SchedulingLexer(new ANTLRInputStream(input));
                 CommonTokenStream tokens = new CommonTokenStream(lexer);
                 SchedulingParser parser = new SchedulingParser(tokens);
 
-                ParseTree tree = parser.query();
-                String obj = ((SchedulingParser.QueryContext) tree).target().getText();
-
-                ParseTreeWalker walker = new ParseTreeWalker();
-                if (obj.equals(CLASSROOM)) {
-                    walker.walk(classroomWalker, tree);
-                } else if (obj.equals(CLASS)) {
-                    walker.walk(classWalker, tree);
-                } else if (obj.equals(LECTURER)) {
+                if (input.contains(CONSTRAINT)) {
+                    ParseTree tree = parser.constraint();
+                    ParseTreeWalker walker = new ParseTreeWalker();
+                    if (input.contains("lecture unavailability")) {
+                        walker.walk(lecturerWalker, tree);
+                    } else if (input.contains("restricted hour")) {
+                        String s = ((SchedulingParser.ConstraintContext) tree).constraint_type().schedule().getText();
+                        if (input.toLowerCase().indexOf("add ") == 0) {
+                            restrictedSchedule.add(s);
+                        } else if (input.toLowerCase().indexOf("add ") == 0) {
+                            restrictedSchedule.remove(s);
+                        }
+                    } else {
+                        walker.walk(classWalker, tree);
+                    }
+                } else if (input.toLowerCase().indexOf("add " + PREFERENCE) == 0 || input.toLowerCase().indexOf("remove " + PREFERENCE) == 0) {
+                    ParseTree tree = parser.preference();
+                    ParseTreeWalker walker = new ParseTreeWalker();
                     walker.walk(lecturerWalker, tree);
-                } else if (obj.equals(PROJECT)) {
-
                 } else {
+                    ParseTree tree = parser.query();
+                    String obj = ((SchedulingParser.QueryContext) tree).target().getText();
 
+                    ParseTreeWalker walker = new ParseTreeWalker();
+                    if (obj.equals(CLASSROOM)) {
+                        walker.walk(classroomWalker, tree);
+                    } else if (obj.equals(CLASS)) {
+                        walker.walk(classWalker, tree);
+                    } else if (obj.equals(LECTURER)) {
+                        walker.walk(lecturerWalker, tree);
+                    }
                 }
             }
         }

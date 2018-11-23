@@ -15,8 +15,7 @@ array: '[]' | '[' string ((',' string)+)? ']';
 value: string | array;
 feature: SINGLE_STRING ':' value ',';
 
-
-constraint: 'add constraint' constraint_type;
+constraint: update_key 'constraint' constraint_type;
 class_string: LETTER | SINGLE_STRING;
 schedule: SINGLE_STRING;
 unavailability: '[' schedule ((',' schedule)+)? ']';
@@ -25,4 +24,4 @@ constraint_type: 'class' class_string class_string | 'lecture unavailability' le
     'restricted hour' schedule;
 
 preferences: '[' schedule ((',' schedule)+)? ']';
-preference: 'add preference' lecturer preferences;
+preference: update_key 'preference' lecturer preferences;

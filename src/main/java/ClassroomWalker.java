@@ -87,22 +87,17 @@ public class ClassroomWalker extends SchedulingBaseListener {
             }
         } else if (currentFunction.equals("update")) {
             if (!currentTargetKey.equals("")) {
-                boolean hasClass = false;
-                if (currentUpdateKey.equals("add")) {
-                    if (currentKey.equals(Classroom.FACILITIES)) {
+                boolean hasClassroom = false;
+                if (currentKey.equals(Classroom.FACILITIES)) {
+                    if (currentUpdateKey.equals("add")) {
                         for (Classroom c : classrooms) {
                             if (c.getName().equals(currentTargetKey)) {
                                 c.addString(currentKey, value);
                                 System.out.println("classroom's facilities has been updated");
-                                hasClass = true;
+                                hasClassroom = true;
                             }
                         }
-                        if (!hasClass) {
-                            System.out.println("There's no classroom with name " + currentTargetKey);
-                        }
-                    }
-                } else if (currentUpdateKey.equals("remove")) {
-                    if (currentKey.equals(Classroom.FACILITIES)) {
+                    } else if (currentUpdateKey.equals("remove")) {
                         String deletedFacility = "";
                         for (Classroom c : classrooms) {
                             if (c.getName().equals(currentTargetKey)) {
@@ -118,11 +113,8 @@ public class ClassroomWalker extends SchedulingBaseListener {
                                     c.getFacilities().remove(deletedFacility);
                                     System.out.println("Facility " + deletedFacility + " from classroom " + currentTargetKey + " has been deleted");
                                 }
-                                hasClass = true;
+                                hasClassroom = true;
                             }
-                        }
-                        if (!hasClass) {
-                            System.out.println("There's no classroom with id " + currentTargetKey);
                         }
                     }
                 } else if (currentKey.equals(Classroom.CAPACITY)) {
@@ -130,10 +122,14 @@ public class ClassroomWalker extends SchedulingBaseListener {
                         if (c.getName().equals(currentTargetKey)) {
                             c.addString(currentKey, value);
                             System.out.println("classroom's capacity has been updated");
+                            hasClassroom = true;
                         }
                     }
                 } else {
                     System.out.println(currentKey + " cannot be updated");
+                }
+                if (!hasClassroom) {
+                    System.out.println("There's no classroom with name " + currentTargetKey);
                 }
             } else {
                 System.out.println("Classroom has no name");

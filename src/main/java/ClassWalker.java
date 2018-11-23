@@ -91,9 +91,6 @@ public class ClassWalker extends SchedulingBaseListener {
                                 hasClass = true;
                             }
                         }
-                        if (!hasClass) {
-                            System.out.println("There's no class with id " + currentTargetKey);
-                        }
                     } else if (currentUpdateKey.equals("remove")) {
                         String deletedReq = "";
                         for (Class c : classes) {
@@ -113,19 +110,20 @@ public class ClassWalker extends SchedulingBaseListener {
                                 hasClass = true;
                             }
                         }
-                        if (!hasClass) {
-                            System.out.println("There's no class with id " + currentTargetKey);
-                        }
                     }
                 } else if (currentKey.equals(Class.SIZE)) {
                     for (Class c : classes) {
                         if (c.getId().equals(currentTargetKey)) {
                             c.addString(currentKey, value);
                             System.out.println("class's size has been updated");
+                            hasClass = true;
                         }
                     }
                 } else {
                     System.out.println(currentKey + " cannot be updated");
+                }
+                if (!hasClass) {
+                    System.out.println("There's no class with id " + currentTargetKey);
                 }
             } else {
                 System.out.println("Class has no id");
@@ -192,15 +190,31 @@ public class ClassWalker extends SchedulingBaseListener {
     @Override
     public void exitConstraint(SchedulingParser.ConstraintContext ctx) {
         super.exitConstraint(ctx);
-        if (class1 != null && class2 != null && !class1.getCode().equals(class2.getCode())) {
-            for (Class c1 : classes) {
-                for (Class c2 : classes) {
-                    if (c1.getCode().equals(class1.getCode()) && c2.getCode().equals(class2.getCode())) {
-                        if (c1.getGrade() != c2.getGrade()) c1.addClash(c2.getId());
-                        else if (c1.getNumber() != c2.getNumber()) c1.addClash(c2.getId());
-                    } else if (c1.getCode().equals(class2.getCode()) && c2.getCode().equals(class1.getCode())) {
-                        if (c1.getGrade() != c2.getGrade()) c1.addClash(c2.getId());
-                        else if (c1.getNumber() != c2.getNumber()) c1.addClash(c2.getId());
+        if (currentUpdateKey.equals("add")) {
+            if (class1 != null && class2 != null && !class1.getCode().equals(class2.getCode())) {
+                for (Class c1 : classes) {
+                    for (Class c2 : classes) {
+                        if (c1.getCode().equals(class1.getCode()) && c2.getCode().equals(class2.getCode())) {
+                            if (c1.getGrade() != c2.getGrade()) c1.addClash(c2.getId());
+                            else if (c1.getNumber() != c2.getNumber()) c1.addClash(c2.getId());
+                        } else if (c1.getCode().equals(class2.getCode()) && c2.getCode().equals(class1.getCode())) {
+                            if (c1.getGrade() != c2.getGrade()) c1.addClash(c2.getId());
+                            else if (c1.getNumber() != c2.getNumber()) c1.addClash(c2.getId());
+                        }
+                    }
+                }
+            }
+        } else if (currentUpdateKey.equals("remove")){
+            if (class1 != null && class2 != null && !class1.getCode().equals(class2.getCode())) {
+                for (Class c1 : classes) {
+                    for (Class c2 : classes) {
+                        if (c1.getCode().equals(class1.getCode()) && c2.getCode().equals(class2.getCode())) {
+                            if (c1.getGrade() != c2.getGrade()) c1.removeClash(c2.getId());
+                            else if (c1.getNumber() != c2.getNumber()) c1.removeClash(c2.getId());
+                        } else if (c1.getCode().equals(class2.getCode()) && c2.getCode().equals(class1.getCode())) {
+                            if (c1.getGrade() != c2.getGrade()) c1.removeClash(c2.getId());
+                            else if (c1.getNumber() != c2.getNumber()) c1.removeClash(c2.getId());
+                        }
                     }
                 }
             }

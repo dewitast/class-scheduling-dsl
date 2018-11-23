@@ -91,103 +91,44 @@ public class LecturerWalker extends SchedulingBaseListener{
             }
         } else if (currentFunction.equals("update")) {
             if (!currentTargetKey.equals("")) {
-                boolean hasClass = false;
-                if (currentKey.equals(Lecturer.UNAVAILABILITY)) {
-                    if (currentUpdateKey.equals("remove")) {
-                        String deletedUnavailability = "";
-                        for (Lecturer l : lecturers) {
-                            if (l.getName().equals(currentTargetKey)) {
-                                //lecturer name is primary key, only found exactly 1
-                                for (String u : l.getUnavailability()) {
-                                    if (value.equals(u)) {
-                                        deletedUnavailability = u;
-                                    }
-                                }
-                                if (deletedUnavailability.equals("")) {
-                                    System.out.println("Lecturer " + currentTargetKey + " has no unavailability " + value);
-                                } else {
-                                    l.getUnavailability().remove(deletedUnavailability);
-                                    System.out.println("Unavailability " + deletedUnavailability + " from lecturer " + currentTargetKey + " has been deleted");
-                                }
-                                hasClass = true;
-                            }
-                        }
-                        if (!hasClass) {
-                            System.out.println("There's no lecturer with name " + currentTargetKey);
-                        }
-                    }
-                } else if (currentKey.equals(Lecturer.CLASSES)) {
+                boolean hasLecturer = false;
+                if (currentKey.equals(Lecturer.CLASSES)) {
                     if (currentUpdateKey.equals("add")) {
                         for (Lecturer l : lecturers) {
                             if (l.getName().equals(currentTargetKey)) {
-                                l.addString(currentKey, value);
+                                l.addClass(value);
                                 System.out.println("lecturer's classes has been updated");
-                                hasClass = true;
+                                hasLecturer = true;
                             }
                         }
-                        if (!hasClass) {
-                            System.out.println("There's no lecturer with name " + currentTargetKey);
-                        }
                     } else if (currentUpdateKey.equals("remove")) {
-                        String deletedClass = "";
+                        boolean hasClass = false;
                         for (Lecturer l : lecturers) {
                             if (l.getName().equals(currentTargetKey)) {
                                 //lecturer name is primary key, only found exactly 1
                                 for (String c : l.getClasses()) {
-                                    if (value.equals(c)) {
-                                        deletedClass = c;
+                                    System.out.println("masuk");
+                                    if (c.equals(value)) {
+                                        hasClass = true;
                                     }
                                 }
-                                if (deletedClass.equals("")) {
+                                if (!hasClass) {
                                     System.out.println("Lecturer " + currentTargetKey + " has no class " + value);
                                 } else {
-                                    l.getClasses().remove(deletedClass);
-                                    System.out.println("Class " + deletedClass + " from lecturer " + currentTargetKey + " has been deleted");
+                                    l.removeClass(value);
                                 }
-                                hasClass = true;
+                                hasLecturer = true;
                             }
                         }
-                        if (!hasClass) {
-                            System.out.println("There's no lecturer with name " + currentTargetKey);
-                        }
-                    }
-                } else if (currentKey.equals(Lecturer.PREFERENCES)) {
-                    if (currentUpdateKey.equals("add")) {
-                        for (Lecturer l : lecturers) {
-                            if (l.getName().equals(currentTargetKey)) {
-                                l.addString(currentKey, value);
-                                System.out.println("lecturer's preferences has been updated");
-                                hasClass = true;
-                            }
-                        }
-                        if (!hasClass) {
-                            System.out.println("There's no lecturer with name " + currentTargetKey);
-                        }
-                    } else if (currentUpdateKey.equals("remove")) {
-                        String deletedPreference = "";
-                        for (Lecturer l : lecturers) {
-                            if (l.getName().equals(currentTargetKey)) {
-                                //lecturer name is primary key, only found exactly 1
-                                for (String p : l.getPreferences()) {
-                                    if (value.equals(p)) {
-                                        deletedPreference = p;
-                                    }
-                                }
-                                if (deletedPreference.equals("")) {
-                                    System.out.println("Lecturer " + currentTargetKey + " has no preference " + value);
-                                } else {
-                                    l.getPreferences().remove(deletedPreference);
-                                    System.out.println("Preference " + deletedPreference + " from lecturer " + currentTargetKey + " has been deleted");
-                                }
-                                hasClass = true;
-                            }
-                        }
-                        if (!hasClass) {
+                        if (!hasLecturer) {
                             System.out.println("There's no lecturer with name " + currentTargetKey);
                         }
                     }
                 } else {
                     System.out.println(currentKey + " cannot be updated");
+                }
+                if (!hasLecturer) {
+                    System.out.println("There's no lecturer with name " + currentTargetKey);
                 }
             } else {
                 System.out.println("Class has no id");
@@ -248,12 +189,24 @@ public class LecturerWalker extends SchedulingBaseListener{
             return;
         }
 
-        List<String> unavailability = asArray(ctx.getText());
-        for (Lecturer l : lecturers) {
-            if (l.getName().equals(currentKey)) {
-                for (String s : unavailability) {
-                    if (l.checkTimeFormat(s)) {
-                        l.addUnavailability(s);
+        System.out.println(ctx.getText());
+        if (currentUpdateKey.equals("add")) {
+            List<String> unavailability = asArray(ctx.getText());
+            for (Lecturer l : lecturers) {
+                if (l.getName().equals(currentKey)) {
+                    for (String s : unavailability) {
+                        if (l.checkTimeFormat(s)) {
+                            l.addUnavailability(s);
+                        }
+                    }
+                }
+            }
+        } else if (currentUpdateKey.equals("remove")) {
+            List<String> unavailability = asArray(ctx.getText());
+            for (Lecturer l : lecturers) {
+                if (l.getName().equals(currentKey)) {
+                    for (String s : unavailability) {
+                        l.removeUnavailability(s);
                     }
                 }
             }
@@ -268,12 +221,23 @@ public class LecturerWalker extends SchedulingBaseListener{
             return;
         }
 
-        List<String> preferences = asArray(ctx.getText());
-        for (Lecturer l : lecturers) {
-            if (l.getName().equals(currentKey)) {
-                for (String s : preferences) {
-                    if (l.checkTimeFormat(s)) {
-                        l.addPreference(s);
+        if (currentUpdateKey.equals("add")) {
+            List<String> preferences = asArray(ctx.getText());
+            for (Lecturer l : lecturers) {
+                if (l.getName().equals(currentKey)) {
+                    for (String s : preferences) {
+                        if (l.checkTimeFormat(s)) {
+                            l.addPreference(s);
+                        }
+                    }
+                }
+            }
+        } else if (currentUpdateKey.equals("remove")) {
+            List<String> preferences = asArray(ctx.getText());
+            for (Lecturer l : lecturers) {
+                if (l.getName().equals(currentKey)) {
+                    for (String p : preferences) {
+                        l.removePreference(p);
                     }
                 }
             }

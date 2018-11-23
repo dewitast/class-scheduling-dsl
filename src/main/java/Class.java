@@ -86,6 +86,10 @@ public class Class {
         this.clashes.add(clash);
     }
 
+    public void removeClash(String clash) {
+        this.clashes.remove(clash);
+    }
+
     public void setSchedules(Set<String> schedules) {
         this.schedules = schedules;
     }

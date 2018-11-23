@@ -9,7 +9,6 @@ public class Lecturer {
     private String name;
     private Set<String> unavailability;
     private Set<String> classes;
-
     private Set<String> preferences;
 
     public Lecturer() {
@@ -55,10 +54,20 @@ public class Lecturer {
         this.unavailability.add(unavailability);
     }
     public void addClass(String aClass) {
-        this.unavailability.add(aClass);
+        this.classes.add(aClass);
     }
     public void addPreference(String preference) {
         this.preferences.add(preference);
+    }
+
+    public void removeUnavailability(String unavailability) {
+        this.unavailability.remove(unavailability);
+    }
+    public void removeClass(String aClass) {
+        this.classes.remove(aClass);
+    }
+    public void removePreference(String preference) {
+        this.preferences.remove(preference);
     }
 
     public boolean check() {
