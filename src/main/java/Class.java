@@ -191,7 +191,7 @@ public class Class {
                 System.out.println("Class " + key + " must be a positive integer");
             }
         } else {
-            System.out.println("(" + key + "," + value + ")" + "is not a classroom's feature");
+            System.out.println("(" + key + "," + value + ")" + "is not a class's feature");
             return false;
         }
         this.id = this.code+'-'+this.number;

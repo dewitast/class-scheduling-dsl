@@ -1,6 +1,4 @@
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class Classroom {
@@ -73,6 +71,6 @@ public class Classroom {
     public void print() {
         System.out.println("Name: " + this.name);
         System.out.println("Capacity: " + this.capacity);
-        System.out.println("Facilities: " + Arrays.asList(facilities));
+        System.out.println("Facilities: " + this.facilities);
     }
 }

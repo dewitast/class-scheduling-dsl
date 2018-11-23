@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ClassroomWalker extends SchedulingBaseListener {
@@ -9,6 +8,7 @@ public class ClassroomWalker extends SchedulingBaseListener {
     private String currentKey;
     private String currentFunction;
     private String currentTargetKey;
+    private String currentUpdateKey;
 
     public ClassroomWalker() {
         classrooms = new ArrayList<>();
@@ -22,6 +22,8 @@ public class ClassroomWalker extends SchedulingBaseListener {
     public void enterQuery(SchedulingParser.QueryContext ctx) {
         super.enterQuery(ctx);
         active = true;
+        currentTargetKey = "";
+        currentUpdateKey = "";
     }
 
     @Override
@@ -56,6 +58,12 @@ public class ClassroomWalker extends SchedulingBaseListener {
     }
 
     @Override
+    public void enterUpdate_key(SchedulingParser.Update_keyContext ctx) {
+        super.enterUpdate_key(ctx);
+        currentUpdateKey = ctx.getText();
+    }
+
+    @Override
     public void enterString(SchedulingParser.StringContext ctx) {
         super.enterString(ctx);
 
@@ -74,19 +82,64 @@ public class ClassroomWalker extends SchedulingBaseListener {
                     }
                 }
             }
-        } else if (currentFunction.equals("update")) {
-            if (currentKey.equals(Classroom.CAPACITY)) {
-                for (Classroom c : classrooms) {
-                    if (c.getName().equals(currentTargetKey)) {
-                        c.addString(currentKey,value);
-                    }
-                }
+            if (!current.addString(currentKey, value)) {
+                active = false;
             }
-        }
-
-
-        if (!current.addString(currentKey, value)) {
-            active = false;
+        } else if (currentFunction.equals("update")) {
+            if (!currentTargetKey.equals("")) {
+                boolean hasClass = false;
+                if (currentUpdateKey.equals("add")) {
+                    if (currentKey.equals(Classroom.FACILITIES)) {
+                        for (Classroom c : classrooms) {
+                            if (c.getName().equals(currentTargetKey)) {
+                                c.addString(currentKey, value);
+                                System.out.println("classroom's facilities has been updated");
+                                hasClass = true;
+                            }
+                        }
+                        if (!hasClass) {
+                            System.out.println("There's no classroom with name " + currentTargetKey);
+                        }
+                    }
+                } else if (currentUpdateKey.equals("remove")) {
+                    if (currentKey.equals(Classroom.FACILITIES)) {
+                        String deletedFacility = "";
+                        for (Classroom c : classrooms) {
+                            if (c.getName().equals(currentTargetKey)) {
+                                //classroom name is primary key, only found exactly 1
+                                for (String f : c.getFacilities()) {
+                                    if (value.equals(f)) {
+                                        deletedFacility = f;
+                                    }
+                                }
+                                if (deletedFacility.equals("")) {
+                                    System.out.println("Classroom " + currentTargetKey + " has no facility " + value);
+                                } else {
+                                    c.getFacilities().remove(deletedFacility);
+                                    System.out.println("Facility " + deletedFacility + " from classroom " + currentTargetKey + " has been deleted");
+                                }
+                                hasClass = true;
+                            }
+                        }
+                        if (!hasClass) {
+                            System.out.println("There's no classroom with id " + currentTargetKey);
+                        }
+                    }
+                } else if (currentKey.equals(Classroom.CAPACITY)) {
+                    for (Classroom c : classrooms) {
+                        if (c.getName().equals(currentTargetKey)) {
+                            c.addString(currentKey, value);
+                            System.out.println("classroom's capacity has been updated");
+                        }
+                    }
+                } else {
+                    System.out.println(currentKey + " cannot be updated");
+                }
+            } else {
+                System.out.println("Classroom has no name");
+            }
+        } else {
+            System.out.println(currentFunction + "is not a clasroom's function");
         }
     }
 
@@ -105,7 +158,12 @@ public class ClassroomWalker extends SchedulingBaseListener {
                     deletedClassroom = c;
                 }
             }
-            classrooms.remove(deletedClassroom);
+            if (deletedClassroom.getName().equals("")) {
+                System.out.println("There are no clasroom with name " + currentTargetKey);
+            } else {
+                classrooms.remove(deletedClassroom);
+                System.out.println("classroom " + deletedClassroom.getName() + " has been deleted");
+            }
         }
 
     }
