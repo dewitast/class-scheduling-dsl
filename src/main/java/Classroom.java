@@ -70,7 +70,7 @@ public class Classroom {
 
     public void print() {
         System.out.println("Name: " + this.name);
-        System.out.println("Capacity: " + this.capacity);
-        System.out.println("Facilities: " + this.facilities);
+        System.out.println("    Capacity: " + this.capacity);
+        System.out.println("    Facilities: " + this.facilities);
     }
 }

@@ -117,8 +117,8 @@ public class Lecturer {
 
     public void print() {
         System.out.println("Name: " + this.name);
-        System.out.println("Unavailability: " + this.unavailability);
-        System.out.println("Classes: " + this.classes);
-        System.out.println("Preferences: "+ this.preferences);
+        System.out.println("    Unavailability: " + this.unavailability);
+        System.out.println("    Classes: " + this.classes);
+        System.out.println("    Preferences: "+ this.preferences);
     }
 }
